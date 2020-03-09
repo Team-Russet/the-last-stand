@@ -81,6 +81,8 @@ public class TrackingService extends Service {
 
                         Location location = locationResult.getLastLocation();
                         if (location != null) {
+                            location.distanceTo()
+
                             //Save the location data to the database//
                             latRef.setValue(location.getLatitude());
                             lonRef.setValue(location.getLongitude());

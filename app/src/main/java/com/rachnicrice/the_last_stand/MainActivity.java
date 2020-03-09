@@ -7,9 +7,11 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -175,6 +177,9 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
 
+                        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                        SharedPreferences.Editor edit = p.edit();
+
                         // if isOnTeam is false, add user to smallest team
                         if(!isOnTeam) {
                             if(knightsSize > dragonsSize) {
@@ -182,11 +187,17 @@ public class MainActivity extends AppCompatActivity {
                                 final String dragonsPath = "teams/dragons/" + uid;
                                 DatabaseReference dragonsRef = database.getReference(dragonsPath);
                                 dragonsRef.setValue(true);
+
+                                edit.putString("enemy_team", "knights");
+                                edit.apply();
                             } else {
                                 // add user to team knights
                                 final String knightsPath = "teams/knights/" + uid;
                                 DatabaseReference knightsRef = database.getReference(knightsPath);
                                 knightsRef.setValue(true);
+
+                                edit.putString("enemy_team", "dragons");
+                                edit.apply();
                             }
                         }
                     }

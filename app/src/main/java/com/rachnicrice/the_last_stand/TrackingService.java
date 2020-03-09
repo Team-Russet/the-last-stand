@@ -38,6 +38,7 @@ public class TrackingService extends Service {
     double userLongitutde = 0;
     String enemyTeam;
     boolean isEnemy;
+    SharedPreferences p;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -51,11 +52,10 @@ public class TrackingService extends Service {
 //        buildNotification();
         database = FirebaseDatabase.getInstance();
 
+        p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         //Get the user
         user = FirebaseAuth.getInstance().getCurrentUser();
-
-        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        enemyTeam = p.getString("enemy_team", "");
 
         requestLocationUpdates();
         compareUserLocations();
@@ -122,11 +122,13 @@ public class TrackingService extends Service {
         ChildEventListener locationChildListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                enemyTeam = p.getString("enemy_team", "");
                 handleLocationChange(dataSnapshot);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                enemyTeam = p.getString("enemy_team", "");
                 handleLocationChange(dataSnapshot);
             }
 
@@ -154,11 +156,15 @@ public class TrackingService extends Service {
 
         // make sure updated user location is not us
         if(!user.getUid().equals(dataSnapshot.getKey())) {
+            Log.i(TAG, "we are not the same user");
+
             //initialize boolean
             isEnemy = false;
 
             // get id of player with changed location
             String playerID = dataSnapshot.getKey();
+
+            Log.i(TAG, "enemy team: " + enemyTeam);
 
             // make sure they are an enemy
             DatabaseReference enemyData = database.getReference("teams/" + enemyTeam);
@@ -166,6 +172,8 @@ public class TrackingService extends Service {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChild(playerID)) {
+                        Log.i(TAG, "we are enemies");
+
                         isEnemy = true;
                     }
                 }

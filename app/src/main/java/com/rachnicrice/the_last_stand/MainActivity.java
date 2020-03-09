@@ -50,12 +50,18 @@ public class MainActivity extends AppCompatActivity {
                 new AuthUI.IdpConfig.PhoneBuilder().build());
 
         // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                202);
+        if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("message");
+            myRef.setValue("Hello, World!");
+        }else{
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setAvailableProviders(providers)
+                            .build(),
+                    202);
+        };
 
 
         //Practice setting up a firebase database and adding info to it!

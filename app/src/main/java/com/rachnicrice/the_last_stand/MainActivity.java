@@ -69,6 +69,66 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("message");
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = user.getUid();
+
+        // grab all teams from db
+        DatabaseReference teamRef = database.getReference("teams");
+
+        teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // boolean for tracking if user on a team
+                boolean isOnTeam = false;
+                // knights team size counter
+                int knightsSize = 0;
+                // dragons team size counter
+                int dragonsSize = 0;
+
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                Log.d(TAG, "children: " + children.toString());
+                for(DataSnapshot team : children) {
+                    Log.d(TAG, team.toString());
+                    for(DataSnapshot user : team.getChildren()) {
+                        // increment team size count
+                        if(team.getKey().equals("knights")) {
+                            knightsSize++;
+                        } else dragonsSize++;
+
+                        // check to see if user on team
+                        if(uid.equals(user.getKey())) {
+                            isOnTeam = true;
+                        }
+                        Log.d(TAG, user.getKey());
+                    }
+                }
+
+                // if isOnTeam is false, add user to smallest team
+                if(!isOnTeam) {
+                    if(knightsSize > dragonsSize) {
+                        // add user to team dragons
+                        final String dragonsPath = "teams/dragons/" + uid;
+                        DatabaseReference dragonsRef = FirebaseDatabase.getInstance().getReference(dragonsPath);
+                        dragonsRef.setValue(true);
+                    } else {
+                        // add user to team knights
+                        final String knightsPath = "teams/knights/" + uid;
+                        DatabaseReference knightsRef = FirebaseDatabase.getInstance().getReference(knightsPath);
+                        knightsRef.setValue(true);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        // identify team with least users
+
+        // if user not assigned to a team, assign to team with least users
+
 //        myRef.setValue("Hello, World!");
 
 //        myRef.addValueEventListener(new ValueEventListener() {
@@ -162,32 +222,6 @@ public class MainActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                String uid = user.getUid();
-
-                // grab all teams from db
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference teamRef = database.getReference("teams");
-
-                teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                        for(Object team : children) {
-                            Log.d(TAG, team.toString());
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-                // identify team with least users
-
-                // if user not assigned to a team, assign to team with least users
-
 
             } else {
                 Log.i(TAG, "Sign in failed!");

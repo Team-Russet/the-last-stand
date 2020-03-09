@@ -85,10 +85,10 @@ public class MainActivity extends AppCompatActivity {
                 // dragons team size counter
                 int dragonsSize = 0;
 
+                // get the teams
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                Log.d(TAG, "children: " + children.toString());
+                // loop through the teams
                 for(DataSnapshot team : children) {
-                    Log.d(TAG, team.toString());
                     for(DataSnapshot user : team.getChildren()) {
                         // increment team size count
                         if(team.getKey().equals("knights")) {

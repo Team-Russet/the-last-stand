@@ -68,12 +68,14 @@ public class TrackingService extends Service {
                     public void onLocationResult(LocationResult locationResult) {
 
                         //Get a reference to the database, so your app can perform read and write operations//
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(path);
+                        DatabaseReference latRef = FirebaseDatabase.getInstance().getReference(path + "/latitude");
+                        DatabaseReference lonRef = FirebaseDatabase.getInstance().getReference(path + "/longitude");
 
                         Location location = locationResult.getLastLocation();
                         if (location != null) {
                             //Save the location data to the database//
-                            ref.setValue(location);
+                            latRef.setValue(location.getLatitude());
+                            lonRef.setValue(location.getLongitude());
                         }
                     }
                 }, null);

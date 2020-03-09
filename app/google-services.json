@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "444641575431",
+    "firebase_url": "https://the-last-stand-dbe4f.firebaseio.com",
+    "project_id": "the-last-stand-dbe4f",
+    "storage_bucket": "the-last-stand-dbe4f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444641575431:android:8186e0bf9baadcb6f620a2",
+        "android_client_info": {
+          "package_name": "com.rachnicrice.the_last_stand"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444641575431-0emq5jsmbkkbgri9sgsm1k68d4a2m387.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rachnicrice.the_last_stand",
+            "certificate_hash": "c05290d933e919046a515cea9888c07fdd1b3710"
+          }
+        },
+        {
+          "client_id": "444641575431-3savkfffkrd87fnbug4n3nul58cgp67h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmfnXw-AJlqTw0uufOGPEbq0DdN9jurMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444641575431-3savkfffkrd87fnbug4n3nul58cgp67h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

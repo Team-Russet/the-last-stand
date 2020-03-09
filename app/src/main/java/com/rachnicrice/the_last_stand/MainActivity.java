@@ -86,12 +86,13 @@ public class MainActivity extends AppCompatActivity {
         //When the log out button is pressed, log the user out
         logout.setOnClickListener((v) -> {
             AuthUI.getInstance()
-                    .signOut(this)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        public void onComplete(@NonNull Task<Void> task) {
-                            finish();
-                        }
-                    });
+                    .signOut(this);
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setAvailableProviders(providers)
+                            .build(),
+                    202);
         });
 
 //Referenced from https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/

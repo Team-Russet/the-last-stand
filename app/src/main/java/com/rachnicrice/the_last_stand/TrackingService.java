@@ -116,7 +116,6 @@ public class TrackingService extends Service {
         return earthRadius * c;
     }
 
-
     private void compareUserLocations() {
         DatabaseReference location = database.getReference("location");
 

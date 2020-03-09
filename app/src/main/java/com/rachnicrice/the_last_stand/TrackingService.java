@@ -37,6 +37,7 @@ public class TrackingService extends Service {
     double userLatitude = 0;
     double userLongitutde = 0;
     String enemyTeam;
+    boolean isEnemy;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -121,37 +122,12 @@ public class TrackingService extends Service {
         ChildEventListener locationChildListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Log.d(TAG, "new location added: " + dataSnapshot.getKey());
-
-                // make sure updated user location is not us
-                if(!user.getUid().equals(dataSnapshot.getKey())) {
-                    // get id of player with changed location
-                    String playerID = dataSnapshot.getKey();
-
-                    // make sure they are an enemy
-                    DatabaseReference enemyData = database.getReference("teams/" + enemyTeam);
-                    enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.hasChild(playerID)) {
-                                // grab updated user's lat and long
-                                Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
-
-                                // compare user location to updated user location
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
+                handleLocationChange(dataSnapshot);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Log.d(TAG, "location changed: " + dataSnapshot.getKey());
+                handleLocationChange(dataSnapshot);
             }
 
             @Override
@@ -171,6 +147,52 @@ public class TrackingService extends Service {
             }
         };
         location.addChildEventListener(locationChildListener);
+    }
+
+    private void handleLocationChange (DataSnapshot dataSnapshot) {
+        Log.d(TAG, "new location added: " + dataSnapshot.getKey());
+
+        // make sure updated user location is not us
+        if(!user.getUid().equals(dataSnapshot.getKey())) {
+            //initialize boolean
+            isEnemy = false;
+
+            // get id of player with changed location
+            String playerID = dataSnapshot.getKey();
+
+            // make sure they are an enemy
+            DatabaseReference enemyData = database.getReference("teams/" + enemyTeam);
+            enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.hasChild(playerID)) {
+                        isEnemy = true;
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            if (isEnemy) {
+                // grab updated user's lat and long
+                Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
+                String enemyLat;
+                String enemyLong;
+
+                for(DataSnapshot value: enemyLocationData) {
+                    if(value.getKey().equals("latitude")){
+                        enemyLat = value.getValue().toString();
+                        Log.i(TAG, enemyLat);
+                    }
+                }
+
+            }
+
+            // compare user location to updated user location
+        }
     }
 
     //reference used: https://rosettacode.org/wiki/Haversine_formula#Java

@@ -28,11 +28,12 @@ This app will keep you on your toes! At any point during your mundane, monotonou
 What will your MVP functionality be?
 - A user can log in.
 - A user is assignmed to a team.
-- A user will get a notification when a member of the opposite team is near.
-- A user can press a button to eliminate the enemy team member.
+- A user will recieve feedback when an enemy is near.
 
 
 What are your stretch goals?
+- A user will get a notification when a member of the opposite team is near.
+- A user can press a button to eliminate the enemy team member.
 - Create game sessions.
 - User team is tied to the game session not the user.
 - Add sound effects when a user is eliminated.
@@ -44,6 +45,8 @@ What are your stretch goals?
 
 ## Stretch
 What stretch goals are you going to aim for?
+- A user will get a notification when a member of the opposite team is near.
+- A user can press a button to eliminate the enemy team member.
 - Create game sessions.
 - User team is randomly re-assigned every new game session.
 - Add sound effects when you win!

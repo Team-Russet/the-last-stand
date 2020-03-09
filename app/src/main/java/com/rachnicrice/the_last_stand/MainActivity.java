@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -68,23 +69,83 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("message");
 
-        myRef.setValue("Hello, World!");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = user.getUid();
 
-        myRef.addValueEventListener(new ValueEventListener() {
+        // grab all teams from db
+        DatabaseReference teamRef = database.getReference("teams");
+
+        teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "Value is: " + value);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // boolean for tracking if user on a team
+                boolean isOnTeam = false;
+                // knights team size counter
+                int knightsSize = 0;
+                // dragons team size counter
+                int dragonsSize = 0;
+
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                Log.d(TAG, "children: " + children.toString());
+                for(DataSnapshot team : children) {
+                    Log.d(TAG, team.toString());
+                    for(DataSnapshot user : team.getChildren()) {
+                        // increment team size count
+                        if(team.getKey().equals("knights")) {
+                            knightsSize++;
+                        } else dragonsSize++;
+
+                        // check to see if user on team
+                        if(uid.equals(user.getKey())) {
+                            isOnTeam = true;
+                        }
+                        Log.d(TAG, user.getKey());
+                    }
+                }
+
+                // if isOnTeam is false, add user to smallest team
+                if(!isOnTeam) {
+                    if(knightsSize > dragonsSize) {
+                        // add user to team dragons
+                        final String dragonsPath = "teams/dragons/" + uid;
+                        DatabaseReference dragonsRef = FirebaseDatabase.getInstance().getReference(dragonsPath);
+                        dragonsRef.setValue(true);
+                    } else {
+                        // add user to team knights
+                        final String knightsPath = "teams/knights/" + uid;
+                        DatabaseReference knightsRef = FirebaseDatabase.getInstance().getReference(knightsPath);
+                        knightsRef.setValue(true);
+                    }
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
+
+        // identify team with least users
+
+        // if user not assigned to a team, assign to team with least users
+
+//        myRef.setValue("Hello, World!");
+
+//        myRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                // This method is called once with the initial value and again
+//                // whenever data at this location is updated.
+//                String value = dataSnapshot.getValue(String.class);
+//                Log.d(TAG, "Value is: " + value);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError error) {
+//                // Failed to read value
+//                Log.w(TAG, "Failed to read value.", error.toException());
+//            }
+//        });
 
         //Grab the log out button
         Button logout = findViewById(R.id.logout);
@@ -154,12 +215,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Log.d(TAG, "request code on auth: " + requestCode);
+
         if (requestCode == 202) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
             } else {
                 Log.i(TAG, "Sign in failed!");

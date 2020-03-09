@@ -3,9 +3,11 @@ package com.rachnicrice.the_last_stand;
 import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -24,12 +26,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class TrackingService extends Service {
 
 //    Referenced from https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/
     private static final String TAG = "rnr";
     FirebaseDatabase database;
+    FirebaseUser user;
+    double userLatitude = 0;
+    double userLongitutde = 0;
+    String enemyTeam;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -43,6 +50,12 @@ public class TrackingService extends Service {
 //        buildNotification();
         database = FirebaseDatabase.getInstance();
 
+        //Get the user
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        enemyTeam = p.getString("enemy_team", "");
+
         requestLocationUpdates();
         compareUserLocations();
     }
@@ -55,8 +68,6 @@ public class TrackingService extends Service {
 
         request.setInterval(10000);
 
-        //Get the user
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
             Log.i(TAG, uid);
@@ -84,11 +95,12 @@ public class TrackingService extends Service {
 
 
                         if (location != null) {
-                            location.distanceTo()
+                            userLatitude = location.getLatitude();
+                            userLongitutde = location.getLongitude();
 
                             //Save the location data to the database//
-                            latRef.setValue(location.getLatitude());
-                            lonRef.setValue(location.getLongitude());
+                            latRef.setValue(userLatitude);
+                            lonRef.setValue(userLongitutde);
                         }
                     }
                 }, null);
@@ -102,21 +114,6 @@ public class TrackingService extends Service {
         //if they are on opposing teams, trigger an activity
 
     }
-    //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
-
-    public static double earthRadius = 6372.8; // earth radius in kilometers
-
-    public static double distanceCalc(double userlat1, double userlon1, double userlat2, double userlon2) {
-        double latDiff = Math.toRadians(userlat1 - userlat2);
-        double lonDiff = Math.toRadians(userlon1 - userlon2);
-        userlat1 = Math.toRadians(userlat1);
-        userlat2 = Math.toRadians(userlat2);
-
-        double a = Math.pow(Math.sin(latDiff / 2),2) + Math.pow(Math.sin(lonDiff / 2),2) * Math.cos(userlat1) * Math.cos(userlat2);
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        return earthRadius * c;
-    }
 
     private void compareUserLocations() {
         DatabaseReference location = database.getReference("location");
@@ -125,6 +122,31 @@ public class TrackingService extends Service {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Log.d(TAG, "new location added: " + dataSnapshot.getKey());
+
+                // make sure updated user location is not us
+                if(!user.getUid().equals(dataSnapshot.getKey())) {
+                    // get id of player with changed location
+                    String playerID = dataSnapshot.getKey();
+
+                    // make sure they are an enemy
+                    DatabaseReference enemyData = database.getReference("teams/" + enemyTeam);
+                    enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.hasChild(playerID)) {
+                                // grab updated user's lat and long
+                                Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
+
+                                // compare user location to updated user location
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
 
             @Override
@@ -149,5 +171,21 @@ public class TrackingService extends Service {
             }
         };
         location.addChildEventListener(locationChildListener);
+    }
+
+    //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
+
+    // returns feet
+    public static double distanceCalc(double userlat1, double userlon1, double userlat2, double userlon2) {
+        double earthRadius = 6372.8; // earth radius in kilometers
+        double latDiff = Math.toRadians(userlat1 - userlat2);
+        double lonDiff = Math.toRadians(userlon1 - userlon2);
+        userlat1 = Math.toRadians(userlat1);
+        userlat2 = Math.toRadians(userlat2);
+
+        double a = Math.pow(Math.sin(latDiff / 2),2) + Math.pow(Math.sin(lonDiff / 2),2) * Math.cos(userlat1) * Math.cos(userlat2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        return earthRadius * c * 3280.84;
     }
 }

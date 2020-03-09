@@ -42,7 +42,7 @@ public class TrackingService extends Service {
     private void requestLocationUpdates() {
         LocationRequest request = new LocationRequest();
 
-    //Specify how often your app should request the device’s location//
+        //Specify how often your app should request the device’s location//
 
         request.setInterval(10000);
 
@@ -71,6 +71,8 @@ public class TrackingService extends Service {
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(path);
 
                         Location location = locationResult.getLastLocation();
+
+
                         if (location != null) {
                             //Save the location data to the database//
                             ref.setValue(location);
@@ -81,8 +83,25 @@ public class TrackingService extends Service {
         } else {
             Log.i(TAG, "No one's signed in!");
         }
+        //for this user, check distance against each other users distance
+        //if this user is within .003048km (10 feet) certain distance from another user, check if they are on the same or opposing teams.
+        //if they are on opposing teams, trigger an activity
 
+    }
+    //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
 
+    public static double earthRadius = 6372.8; // earth radius in kilometers
+
+    public static double distanceCalc(double userlat1, double userlon1, double userlat2, double userlon2) {
+        double latDiff = Math.toRadians(userlat1 - userlat2);
+        double lonDiff = Math.toRadians(userlon1 - userlon2);
+        userlat1 = Math.toRadians(userlat1);
+        userlat2 = Math.toRadians(userlat2);
+
+        double a = Math.pow(Math.sin(latDiff / 2),2) + Math.pow(Math.sin(lonDiff / 2),2) * Math.cos(userlat1) * Math.cos(userlat2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        return earthRadius * c;
     }
 
 }

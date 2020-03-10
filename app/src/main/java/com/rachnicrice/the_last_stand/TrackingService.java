@@ -194,6 +194,8 @@ public class TrackingService extends Service {
                                     Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
 
                             Log.i(TAG, "and the distance is..... " + distance);
+
+                            distanceHandler(distance, playerID);
                         }
                     }
                 }
@@ -209,9 +211,12 @@ public class TrackingService extends Service {
     //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
 
     public void distanceHandler (double distance, String playerID) {
-        if (distance <= 10) {
+        if (distance <= 100) {
             DatabaseReference me = database.getReference("teams/" + myTeam + "/" + user.getUid());
             DatabaseReference enemy = database.getReference("teams/" + enemyTeam + "/" + playerID);
+
+            me.setValue(false);
+            enemy.setValue(false);
         }
     }
 

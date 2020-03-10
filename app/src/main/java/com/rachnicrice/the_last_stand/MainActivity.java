@@ -58,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Create and launch sign-in intent
         if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-            DatabaseReference myRef = database.getReference("message");
-            myRef.setValue("Hello, World!");
+            Log.v(TAG, "The user is already logged in!");
         }else{
             startActivityForResult(
                     AuthUI.getInstance()

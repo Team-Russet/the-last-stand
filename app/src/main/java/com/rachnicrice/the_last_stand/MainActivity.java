@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
                                 dragonsRef.setValue(true);
 
                                 edit.putString("enemy_team", "knights");
+                                edit.putString("my_team", "dragons");
                                 edit.apply();
                             } else {
                                 // add user to team knights
@@ -197,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
                                 knightsRef.setValue(true);
 
                                 edit.putString("enemy_team", "dragons");
+                                edit.putString("my_team", "knights");
                                 edit.apply();
                             }
                         }

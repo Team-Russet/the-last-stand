@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,18 +28,18 @@ public class ResultActivity extends AppCompatActivity {
         if (result.equals("eliminated")) {
             if (myTeam.equals("dragons")) {
                 image.setImageResource(R.drawable.knight);
-                text.setText("You have been slain!");
+                text.setText(R.string.eliminated_dragon);
             } else  {
                 image.setImageResource(R.drawable.dragon_fire);
-                text.setText("You have been defeated.");
+                text.setText(R.string.eliminated_knight);
             }
         } else {
             if (myTeam.equals("dragons")) {
                 image.setImageResource(R.drawable.dragon_fire);
-                text.setText("The knight has been slain!");
+                text.setText(R.string.dragon_wins);
             } else  {
                 image.setImageResource(R.drawable.knight);
-                text.setText("You have slain the dragon!");
+                text.setText(R.string.knight_wins);
             }
         }
 

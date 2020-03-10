@@ -37,7 +37,7 @@ public class TrackingService extends Service {
     double userLatitude = 0;
     double userLongitutde = 0;
     String enemyTeam;
-    boolean isEnemy;
+    String myTeam;
     SharedPreferences p;
 
     @Override
@@ -123,12 +123,14 @@ public class TrackingService extends Service {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 enemyTeam = p.getString("enemy_team", "");
+                myTeam = p.getString("my_team", "");
                 handleLocationChange(dataSnapshot);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 enemyTeam = p.getString("enemy_team", "");
+                myTeam = p.getString("my_team", "");
                 handleLocationChange(dataSnapshot);
             }
 
@@ -166,43 +168,57 @@ public class TrackingService extends Service {
             Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
 
             // make sure they are an enemy
-            DatabaseReference enemyData = database.getReference("teams/" + enemyTeam);
+            DatabaseReference enemyData = database.getReference("teams/" + enemyTeam + "/" + playerID);
             enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.hasChild(playerID)) {
-                        Log.i(TAG, "we are enemies");
+                    if(dataSnapshot.getValue(Boolean.class) != null) {
+                        if (dataSnapshot.getValue(Boolean.class)) {
+                            Log.i(TAG, "we are enemies");
 
-                        String enemyLat = "";
-                        String enemyLong = "";
+                            String enemyLat = "";
+                            String enemyLong = "";
 
-                        for(DataSnapshot value: enemyLocationData) {
-                            if(value.getKey().equals("latitude")){
-                                enemyLat = value.getValue().toString();
-                                Log.i(TAG, enemyLat);
-                            } else {
-                                enemyLong = value.getValue().toString();
-                                Log.i(TAG, enemyLong);
+                            for(DataSnapshot value: enemyLocationData) {
+                                if(value.getKey().equals("latitude")){
+                                    enemyLat = value.getValue().toString();
+                                    Log.i(TAG, enemyLat);
+                                } else {
+                                    enemyLong = value.getValue().toString();
+                                    Log.i(TAG, enemyLong);
+                                }
                             }
+
+                            // compare user location to updated user location
+                            double distance = distanceCalc(userLatitude, userLongitutde,
+                                    Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
+
+                            Log.i(TAG, "and the distance is..... " + distance);
+
+                            distanceHandler(distance, playerID);
                         }
-
-                        // compare user location to updated user location
-                        double distance = distanceCalc(userLatitude, userLongitutde,
-                                Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
-
-                        Log.i(TAG, "and the distance is..... " + distance);
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Log.i(TAG, "databaseError");
                 }
             });
         }
     }
 
     //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
+
+    public void distanceHandler (double distance, String playerID) {
+        if (distance <= 100) {
+            DatabaseReference me = database.getReference("teams/" + myTeam + "/" + user.getUid());
+            DatabaseReference enemy = database.getReference("teams/" + enemyTeam + "/" + playerID);
+
+            me.setValue(false);
+            enemy.setValue(false);
+        }
+    }
 
     // returns feet
     public static double distanceCalc(double userlat1, double userlon1, double userlat2, double userlon2) {

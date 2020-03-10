@@ -163,8 +163,6 @@ public class TrackingService extends Service {
             // get id of player with changed location
             String playerID = dataSnapshot.getKey();
 
-            Log.i(TAG, "enemy team: " + enemyTeam);
-
             Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
 
             // make sure they are an enemy
@@ -172,7 +170,6 @@ public class TrackingService extends Service {
             enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Log.i(TAG, "enemy is still in the game? " + dataSnapshot.getValue());
                     if(dataSnapshot.getValue(Boolean.class) != null) {
                         if (dataSnapshot.getValue(Boolean.class)) {
                             Log.i(TAG, "we are enemies");
@@ -221,10 +218,12 @@ public class TrackingService extends Service {
             DatabaseReference enemy = database.getReference("teams/" + enemyTeam + "/" + playerID);
 
 //            me.setValue(false);
-//            enemy.setValue(false);
+            enemy.setValue(false);
 
             Intent i = new Intent(this, BattleActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.putExtra("my_id", user.getUid());
+            i.putExtra("enemy_id", playerID);
             startActivity(i);
         }
     }

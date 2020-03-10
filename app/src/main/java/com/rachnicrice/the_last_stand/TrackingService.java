@@ -211,7 +211,7 @@ public class TrackingService extends Service {
     //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
 
     public void distanceHandler (double distance, String playerID) {
-        if (distance <= 100) {
+        if (distance <= 10) {
             DatabaseReference me = database.getReference("teams/" + myTeam + "/" + user.getUid());
             DatabaseReference enemy = database.getReference("teams/" + enemyTeam + "/" + playerID);
 

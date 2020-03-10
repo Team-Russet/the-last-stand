@@ -4,4 +4,7 @@
     <string name="battle_thine_enemy">Battle Thine Enemy!</string>
     <string name="image_button_for_battling_the_enemy">Image button for battling the enemy</string>
     <string name="textview">TextView</string>
+    <string name="howToPlay">Button</string>
+    <string name="how_to_play">how to play</string>
+    <string name="dragon_or_knight">Dragon or Knight?</string>
 </resources>

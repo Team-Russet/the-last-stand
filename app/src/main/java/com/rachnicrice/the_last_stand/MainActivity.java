@@ -14,12 +14,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,21 +28,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public final String TAG = "rnr";
+    public final String TAG = "rnr.MainActivity";
     private static final int PERMISSIONS_REQUEST = 100;
     private FirebaseAuth mAuth;
     FirebaseDatabase database;
+    SharedPreferences p;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         database = FirebaseDatabase.getInstance();
 
@@ -104,7 +105,16 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST);
         }
-    }
+
+        SharedPreferences userTeam = PreferenceManager.getDefaultSharedPreferences(this);
+        String teamID = userTeam.getString("my_team", "default");
+        TextView homePageTitle = findViewById(R.id.teamName);
+
+           if(!teamID.equals("default")){
+               String newText = "Team " + teamID;
+               homePageTitle.setText(newText);
+            }
+}
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[]
@@ -158,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                         int knightsSize = 0;
                         // dragons team size counter
                         int dragonsSize = 0;
+                        SharedPreferences.Editor edit = p.edit();
 
                         // get the teams
                         Iterable<DataSnapshot> children = dataSnapshot.getChildren();
@@ -167,18 +178,33 @@ public class MainActivity extends AppCompatActivity {
                                 // increment team size count
                                 if(team.getKey().equals("knights")) {
                                     knightsSize++;
-                                } else dragonsSize++;
+                                    // check to see if user on team
+                                    if(uid.equals(user.getKey())) {
+                                        isOnTeam = true;
+                                        edit.putString("enemy_team", "dragons");
+                                        edit.putString("my_team", "knights");
+                                        edit.apply();
 
-                                // check to see if user on team
-                                if(uid.equals(user.getKey())) {
-                                    isOnTeam = true;
+                                        Log.d(TAG, "Logged in as " + uid +
+                                                ". My team: " + p.getString("my_team", "") +
+                                                ". Enemy team: " + p.getString("enemy_team", ""));
+                                    }
+                                } else {
+                                    dragonsSize++;
+                                    // check to see if user on team
+                                    if(uid.equals(user.getKey())) {
+                                        isOnTeam = true;
+                                        edit.putString("enemy_team", "knights");
+                                        edit.putString("my_team", "dragons");
+                                        edit.apply();
+
+                                        Log.d(TAG, "Logged in as " + uid +
+                                                ". My team: " + p.getString("my_team", "") +
+                                                ". Enemy team: " + p.getString("enemy_team", ""));
+                                    }
                                 }
-                                Log.d(TAG, user.getKey());
                             }
                         }
-
-                        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        SharedPreferences.Editor edit = p.edit();
 
                         // if isOnTeam is false, add user to smallest team
                         if(!isOnTeam) {
@@ -191,6 +217,10 @@ public class MainActivity extends AppCompatActivity {
                                 edit.putString("enemy_team", "knights");
                                 edit.putString("my_team", "dragons");
                                 edit.apply();
+
+                                Log.d(TAG, "Logged in as " + uid +
+                                        ". My team: " + p.getString("my_team", "") +
+                                        ". Enemy team: " + p.getString("enemy_team", ""));
                             } else {
                                 // add user to team knights
                                 final String knightsPath = "teams/knights/" + uid;
@@ -200,6 +230,10 @@ public class MainActivity extends AppCompatActivity {
                                 edit.putString("enemy_team", "dragons");
                                 edit.putString("my_team", "knights");
                                 edit.apply();
+
+                                Log.d(TAG, "Logged in as " + uid +
+                                        ". My team: " + p.getString("my_team", "") +
+                                        ". Enemy team: " + p.getString("enemy_team", ""));
                             }
                         }
                     }
@@ -215,6 +249,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
 }

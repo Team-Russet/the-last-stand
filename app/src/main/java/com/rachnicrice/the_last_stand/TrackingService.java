@@ -31,7 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 public class TrackingService extends Service {
 
 //    Referenced from https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/
-    private static final String TAG = "rnr";
+    private static final String TAG = "rnr.TrackingService";
     FirebaseDatabase database;
     FirebaseUser user;
     double userLatitude = 0;
@@ -172,6 +172,7 @@ public class TrackingService extends Service {
             enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Log.i(TAG, "enemy is still in the game? " + dataSnapshot.getValue());
                     if(dataSnapshot.getValue(Boolean.class) != null) {
                         if (dataSnapshot.getValue(Boolean.class)) {
                             Log.i(TAG, "we are enemies");
@@ -182,20 +183,24 @@ public class TrackingService extends Service {
                             for(DataSnapshot value: enemyLocationData) {
                                 if(value.getKey().equals("latitude")){
                                     enemyLat = value.getValue().toString();
-                                    Log.i(TAG, enemyLat);
+                                    Log.i(TAG, "enemy latitude: " + enemyLat);
                                 } else {
                                     enemyLong = value.getValue().toString();
-                                    Log.i(TAG, enemyLong);
+                                    Log.i(TAG, "enemy longitude: " + enemyLong);
                                 }
                             }
 
-                            // compare user location to updated user location
-                            double distance = distanceCalc(userLatitude, userLongitutde,
-                                    Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
+                            if(!enemyLat.equals("") && !enemyLong.equals("")) {
+                                // compare user location to updated user location
+                                double distance = distanceCalc(userLatitude, userLongitutde,
+                                        Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
 
-                            Log.i(TAG, "and the distance is..... " + distance);
+                                Log.i(TAG, "distance to enemy: " + distance);
 
-                            distanceHandler(distance, playerID);
+                                distanceHandler(distance, playerID);
+                            } else {
+                                Log.i(TAG, "enemy lat or lon was empty");
+                            }
                         }
                     }
                 }
@@ -215,8 +220,12 @@ public class TrackingService extends Service {
             DatabaseReference me = database.getReference("teams/" + myTeam + "/" + user.getUid());
             DatabaseReference enemy = database.getReference("teams/" + enemyTeam + "/" + playerID);
 
-            me.setValue(false);
-            enemy.setValue(false);
+//            me.setValue(false);
+//            enemy.setValue(false);
+
+            Intent i = new Intent(this, BattleActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         }
     }
 

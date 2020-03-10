@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">the-last-stand</string>
+    <string name="app_name">Last Stand</string>
     <string name="logout">Logout</string>
+    <string name="battle_thine_enemy">Battle Thine Enemy!</string>
+    <string name="image_button_for_battling_the_enemy">Image button for battling the enemy</string>
+    <string name="textview">TextView</string>
 </resources>

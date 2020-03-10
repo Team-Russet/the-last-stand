@@ -158,13 +158,12 @@ public class TrackingService extends Service {
         if(!user.getUid().equals(dataSnapshot.getKey())) {
             Log.i(TAG, "we are not the same user");
 
-            //initialize boolean
-            isEnemy = false;
-
             // get id of player with changed location
             String playerID = dataSnapshot.getKey();
 
             Log.i(TAG, "enemy team: " + enemyTeam);
+
+            Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
 
             // make sure they are an enemy
             DatabaseReference enemyData = database.getReference("teams/" + enemyTeam);
@@ -174,7 +173,24 @@ public class TrackingService extends Service {
                     if(dataSnapshot.hasChild(playerID)) {
                         Log.i(TAG, "we are enemies");
 
-                        isEnemy = true;
+                        String enemyLat = "";
+                        String enemyLong = "";
+
+                        for(DataSnapshot value: enemyLocationData) {
+                            if(value.getKey().equals("latitude")){
+                                enemyLat = value.getValue().toString();
+                                Log.i(TAG, enemyLat);
+                            } else {
+                                enemyLong = value.getValue().toString();
+                                Log.i(TAG, enemyLong);
+                            }
+                        }
+
+                        // compare user location to updated user location
+                        double distance = distanceCalc(userLatitude, userLongitutde,
+                                Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
+
+                        Log.i(TAG, "and the distance is..... " + distance);
                     }
                 }
 
@@ -183,23 +199,6 @@ public class TrackingService extends Service {
 
                 }
             });
-
-            if (isEnemy) {
-                // grab updated user's lat and long
-                Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
-                String enemyLat;
-                String enemyLong;
-
-                for(DataSnapshot value: enemyLocationData) {
-                    if(value.getKey().equals("latitude")){
-                        enemyLat = value.getValue().toString();
-                        Log.i(TAG, enemyLat);
-                    }
-                }
-
-            }
-
-            // compare user location to updated user location
         }
     }
 

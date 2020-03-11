@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,10 +57,26 @@ public class MainActivity extends AppCompatActivity {
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.PhoneBuilder().build());
 
+        //change text view to team name
+        SharedPreferences userTeam = PreferenceManager.getDefaultSharedPreferences(this);
+        String teamID = userTeam.getString("my_team", "default");
+        TextView homePageTitle = findViewById(R.id.teamName);
+
+        if(!teamID.equals("default")){
+            String newText = "Team: " + teamID;
+            homePageTitle.setText(newText);
+        }
+
+        //navigate to how to play page on how to play button push
+        View howToPlay = findViewById(R.id.howToPlay);
+        howToPlay.setOnClickListener((v) -> {
+            Intent intent = new Intent(this, HowToPlay.class);
+            startActivity(intent);
+        });
+
         // Create and launch sign-in intent
         if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-            DatabaseReference myRef = database.getReference("message");
-            myRef.setValue("Hello, World!");
+            Log.v(TAG, "The user is already logged in!");
         }else{
             startActivityForResult(
                     AuthUI.getInstance()
@@ -105,15 +122,6 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST);
         }
-
-        SharedPreferences userTeam = PreferenceManager.getDefaultSharedPreferences(this);
-        String teamID = userTeam.getString("my_team", "default");
-        TextView homePageTitle = findViewById(R.id.teamName);
-
-           if(!teamID.equals("default")){
-               String newText = "Team " + teamID;
-               homePageTitle.setText(newText);
-            }
 }
 
     @Override

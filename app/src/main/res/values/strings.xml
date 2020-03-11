@@ -7,4 +7,11 @@
     <string name="howToPlay">Button</string>
     <string name="how_to_play">how to play</string>
     <string name="dragon_or_knight">Dragon or Knight?</string>
+    <string name="how_to_play_">How to Play:</string>
+    <string name="n_when_you_create_an_account_you_are_assigned_to_a_team_n_when_you_get_close_to_an_opposing_team_member_a_notification_will_pop_up_on_your_device_n_click_on_the_button_the_fastest_to_win">\n -When you create an account, you are assigned to a team. \n -When you get close to an opposing team member, a notification will pop up on your device. \n -Click on the button the fastest to win!</string>
+    <string name="_1_create_an_account_n_n2_when_an_enemy_is_near_click_the_button_to_fight_n_n3_first_player_to_hit_the_button_is_the_winner_of_that_round_n_n4_the_team_of_the_last_remaining_player_is_the_winner">1. Create an account. \n\n2. When an enemy is near, click the button to fight. \n\n3. First player to hit the button is the winner of that round.\n\n4. The team of the last remaining player, is the winner!</string>
+    <string name="this_game_is_much_more_fun_with_friends_so_gather_your_friends_and_have_them_install_last_stand_on_their_device">This game is much more fun with friends, so gather your friends and have them install Last Stand on their device!</string>
+    <string name="home">Home</string>
+    <string name="ins">1. Create an account \n\n2. When an enemy is near click the button to fight. \n\n3. First player to hit the button is the winner of that round.\n\n4. The team of the last remaining player is the winner.</string>
+    <string name="blurb">This game is much more fun with friends, so gather your friends and have them install Last Stand on their device!</string>
 </resources>

@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,6 +32,12 @@ public class ResultActivity extends AppCompatActivity {
 
         ImageView image = findViewById(R.id.resultImage);
         TextView text = findViewById(R.id.resultText);
+        Button home = findViewById(R.id.home);
+
+        home.setOnClickListener((v) -> {
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(i);
+        });
 
         if (result.equals("eliminated")) {
             if (myTeam.equals("dragons")) {

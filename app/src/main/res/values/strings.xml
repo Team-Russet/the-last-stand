@@ -8,4 +8,6 @@
     <string name="eliminated_knight">You have been defeated.</string>
     <string name="dragon_wins">The knight has been slain!</string>
     <string name="knight_wins">You have slain the dragon!</string>
+    <string name="return_home">Return Home</string>
+    <string name="knight">Knight</string>
 </resources>

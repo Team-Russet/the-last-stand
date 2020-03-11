@@ -64,8 +64,15 @@ public class BattleActivity extends AppCompatActivity {
 
         // set listener for image button
         imgBtn.setOnClickListener(v -> {
-            mDatabase.child("users").child(myID).setValue(new Date());
-            finish();
+
+            Date date = new Date();
+            // add timestamp to db
+            mDatabase.child("users").child(myID).setValue(date.getTime());
+
+            // analyze results
+            Intent intent = new Intent(getApplicationContext(), AnalyzeResultsActivity.class);
+            intent.putExtra("time", date.getTime());
+            startActivity(intent);
         });
     }
 }

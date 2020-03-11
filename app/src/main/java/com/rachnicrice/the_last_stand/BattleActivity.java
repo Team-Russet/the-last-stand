@@ -11,6 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Date;
+
 public class BattleActivity extends AppCompatActivity {
 
     final static String TAG = "rnr.BattleActivity";
@@ -19,11 +26,19 @@ public class BattleActivity extends AppCompatActivity {
     SharedPreferences p;
     String myTeam = "";
     String enemyTeam = "";
+    private DatabaseReference mDatabase;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        //Get the user
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        Log.i(TAG, "user id: " + user.getUid());
 
         p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         myTeam = p.getString("my_team", "");
@@ -50,6 +65,14 @@ public class BattleActivity extends AppCompatActivity {
         // set listener for image button
         imgBtn.setOnClickListener(v -> {
 
+            Date date = new Date();
+            // add timestamp to db
+            mDatabase.child("users").child(myID).setValue(date.getTime());
+
+            // analyze results
+            Intent intent = new Intent(getApplicationContext(), AnalyzeResultsActivity.class);
+            intent.putExtra("time", date.getTime());
+            startActivity(intent);
         });
     }
 }

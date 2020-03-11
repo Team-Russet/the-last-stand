@@ -62,7 +62,7 @@ public class ResultActivity extends AppCompatActivity {
             }
         };
 
-        finishTaskHandler.postDelayed(finishTask, 10000);
+        finishTaskHandler.postDelayed(finishTask, 15000);
     }
 
     @Override

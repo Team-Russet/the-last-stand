@@ -26,7 +26,7 @@ public class BattleActivity extends AppCompatActivity {
     SharedPreferences p;
     String myTeam = "";
     String enemyTeam = "";
-    FirebaseDatabase database;
+    private DatabaseReference mDatabase;
     FirebaseUser user;
 
     @Override
@@ -34,7 +34,7 @@ public class BattleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
 
-        database = FirebaseDatabase.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //Get the user
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -64,10 +64,8 @@ public class BattleActivity extends AppCompatActivity {
 
         // set listener for image button
         imgBtn.setOnClickListener(v -> {
-            DatabaseReference userRef = database.getReference("users/" + myID);
-            Date date = new Date();
-            Log.i(TAG, "date: " + date);
-            userRef.setValue(date.toString());
+            mDatabase.child("users").child(myID).setValue(new Date());
+            finish();
         });
     }
 }

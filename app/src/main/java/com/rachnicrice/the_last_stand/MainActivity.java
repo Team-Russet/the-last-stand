@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         TextView homePageTitle = findViewById(R.id.teamName);
 
         if(!teamID.equals("default")){
-            String newText = "Team " + teamID;
+            String newText = "Team: " + teamID;
             homePageTitle.setText(newText);
         }
 

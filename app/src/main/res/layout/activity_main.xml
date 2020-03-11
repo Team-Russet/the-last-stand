@@ -18,17 +18,19 @@
 
     <TextView
         android:id="@+id/teamName"
-        android:layout_width="377dp"
-        android:layout_height="70dp"
+        android:layout_width="376dp"
+        android:layout_height="126dp"
         android:backgroundTint="#8F091D"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="@string/dragon_or_knight"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.432"
+        app:layout_constraintHorizontal_bias="0.457"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.761" />
 
     <ImageView
         android:id="@+id/imageView"

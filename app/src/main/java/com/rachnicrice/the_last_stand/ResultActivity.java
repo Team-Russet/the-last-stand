@@ -3,6 +3,7 @@ package com.rachnicrice.the_last_stand;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 public class ResultActivity extends AppCompatActivity {
 
     SharedPreferences p;
+    MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +23,8 @@ public class ResultActivity extends AppCompatActivity {
         p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String result = p.getString("eliminated", "");
         String myTeam = p.getString("my_team", "");
+
+        player = MediaPlayer.create(this, R.raw.lobo);
 
         ImageView image = findViewById(R.id.resultImage);
         TextView text = findViewById(R.id.resultText);

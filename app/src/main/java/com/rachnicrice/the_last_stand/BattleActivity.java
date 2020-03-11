@@ -11,6 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Date;
+
 public class BattleActivity extends AppCompatActivity {
 
     final static String TAG = "rnr.BattleActivity";
@@ -19,11 +26,19 @@ public class BattleActivity extends AppCompatActivity {
     SharedPreferences p;
     String myTeam = "";
     String enemyTeam = "";
+    FirebaseDatabase database;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
+
+        database = FirebaseDatabase.getInstance();
+
+        //Get the user
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        Log.i(TAG, "user id: " + user.getUid());
 
         p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         myTeam = p.getString("my_team", "");
@@ -49,7 +64,10 @@ public class BattleActivity extends AppCompatActivity {
 
         // set listener for image button
         imgBtn.setOnClickListener(v -> {
-
+            DatabaseReference userRef = database.getReference("users/" + myID);
+            Date date = new Date();
+            Log.i(TAG, "date: " + date);
+            userRef.setValue(date.toString());
         });
     }
 }

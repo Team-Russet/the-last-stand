@@ -116,6 +116,7 @@ obj/
 **/.idea/sqlDataSources.xml
 **/.idea/dynamic.xml
 **/.idea/uiDesigner.xml
+**/.idea/caches/build_file_checksums.ser
 
 # OS-specific files
 .DS_Store
@@ -210,3 +211,6 @@ Temporary Items
 # End of https://www.gitignore.io/api/java,macos,android,androidstudio
 **markdown-navigator.xml
 BuyCheapStuff
+
+# Dev files
+user_creds.txt

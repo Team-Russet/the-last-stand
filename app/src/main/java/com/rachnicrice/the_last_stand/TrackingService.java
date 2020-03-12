@@ -28,10 +28,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Date;
+
 public class TrackingService extends Service {
 
 //    Referenced from https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/
-    private static final String TAG = "rnr.TrackingService";
+    private static final String TAG = "rnr.Tracking";
     FirebaseDatabase database;
     FirebaseUser user;
     double userLatitude = 0;
@@ -67,9 +69,31 @@ public class TrackingService extends Service {
 
         //Specify how often your app should request the device’s location//
 
-        request.setInterval(10000);
+        request.setInterval(1000);
 
-        if (user != null) {
+        SharedPreferences.Editor editor = p.edit();
+        DatabaseReference myTeamRef = database.getReference("teams/" + myTeam + "/" + user.getUid());
+        myTeamRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.i(TAG, "am I still in play? " + dataSnapshot.getValue());
+                if(dataSnapshot.getValue(Boolean.class) != null) {
+                    if(!dataSnapshot.getValue(Boolean.class)) {
+                        Log.i(TAG, "player teams/" + user.getUid() + " will be set to false");
+                        editor.putBoolean("amIStillInPlay", false);
+                        editor.apply();
+                        request.setExpirationTime(new Date().getTime());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        if (user != null && p.getBoolean("amIStillInPlay", true)) {
             String uid = user.getUid();
             Log.i(TAG, uid);
 
@@ -122,16 +146,20 @@ public class TrackingService extends Service {
         ChildEventListener locationChildListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                enemyTeam = p.getString("enemy_team", "");
-                myTeam = p.getString("my_team", "");
-                handleLocationChange(dataSnapshot);
+                if(p.getBoolean("amIStillInPlay", true)) {
+                    enemyTeam = p.getString("enemy_team", "");
+                    myTeam = p.getString("my_team", "");
+                    handleLocationChange(dataSnapshot);
+                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                enemyTeam = p.getString("enemy_team", "");
-                myTeam = p.getString("my_team", "");
-                handleLocationChange(dataSnapshot);
+                if(p.getBoolean("amIStillInPlay", true)) {
+                    enemyTeam = p.getString("enemy_team", "");
+                    myTeam = p.getString("my_team", "");
+                    handleLocationChange(dataSnapshot);
+                }
             }
 
             @Override
@@ -213,7 +241,7 @@ public class TrackingService extends Service {
     //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
 
     public void distanceHandler (double distance, String playerID) {
-        if (distance <= 30) {
+        if (distance <= 100) {
             DatabaseReference me = database.getReference("teams/" + myTeam + "/" + user.getUid());
             DatabaseReference enemy = database.getReference("teams/" + enemyTeam + "/" + playerID);
 

@@ -2,15 +2,18 @@ package com.rachnicrice.the_last_stand;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ResultActivity extends AppCompatActivity {
 
+    final String TAG = "rnr.Results";
     SharedPreferences p;
 
     @Override
@@ -19,13 +22,14 @@ public class ResultActivity extends AppCompatActivity {
         setContentView(R.layout.activity_result);
 
         p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String result = p.getString("eliminated", "");
+        boolean result = p.getBoolean("eliminated", false);
+        Log.d(TAG, "result: " + result);
         String myTeam = p.getString("my_team", "");
 
         ImageView image = findViewById(R.id.resultImage);
         TextView text = findViewById(R.id.resultText);
 
-        if (result.equals("eliminated")) {
+        if (result) {
             if (myTeam.equals("dragons")) {
                 image.setImageResource(R.drawable.knight);
                 text.setText(R.string.eliminated_dragon);
@@ -48,7 +52,8 @@ public class ResultActivity extends AppCompatActivity {
         Runnable finishTask = new Runnable() {
             @Override
             public void run() {
-                finish();
+                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(i);
             }
         };
 

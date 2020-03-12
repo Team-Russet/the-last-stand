@@ -33,7 +33,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public final String TAG = "rnr.MainActivity";
+    public final String TAG = "rnr.Main";
     private static final int PERMISSIONS_REQUEST = 100;
     private FirebaseAuth mAuth;
     FirebaseDatabase database;

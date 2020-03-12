@@ -37,10 +37,10 @@ Our user stories can be found [here.](https://trello.com/b/JDEHv6If/last-stand)
 ## About the Developers
 
 #### [Ashlyn Morin](https://www.linkedin.com/in/ashlyn-morin/)
-Ashlyn Morin is
+Hi, my name is Ashlyn and I am passionate about creating software that helps ease the burden of business and life in general. I believe that technology is something that can enhance anyone’s life and business, and have seen that in my own life. I formerly worked as an Accounts Executive for a coffee company and utilized different tech applications to streamline operations at the company, making it more efficient and increasing profits. I decided that I wanted to be the one to create those technologies that I was using, so I began my journey into the tech industry. I really value helping others, organization, efficiency and creativity and the fact that I can combine all of that into a career that helps other people is really exciting to me.
 
 #### [Chase Tucker](https://www.linkedin.com/in/chaseatucker/)
-Chase Tucker is
+Chase Tucker is a Full-Stack Developer with a passion for turning ideas into delightful solutions. He is a veteran, a former Manufacturing Manager and Analyst. While working in manufacturing, he recognized that software had the greatest potential to overcome the greatest challenges. Chase pursued C.S. degree part-time while working, but realized the fastest path to his passion was through attending a code school. He excels at building powerful data pipelines and serving them up to create beautiful user experiences. He believes his diverse background and skill set give him the tools he needs to tackle any challenge.
 
 #### [Rachael Rice](https://www.linkedin.com/in/rachaelnrice/)
 Rachael is a customer service expert turned software developer. She fell in love with the quickly evolving, ever-changing world of technology and never looked back! Today she spends her time continuing to serve people through user-focused design and development.

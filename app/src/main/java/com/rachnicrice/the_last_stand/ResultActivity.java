@@ -8,12 +8,14 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ResultActivity extends AppCompatActivity {
 
+    final String TAG = "rnr.Results";
     SharedPreferences p;
     MediaPlayer victory;
     MediaPlayer defeat;
@@ -24,7 +26,8 @@ public class ResultActivity extends AppCompatActivity {
         setContentView(R.layout.activity_result);
 
         p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String result = p.getString("eliminated", "");
+        boolean result = p.getBoolean("eliminated", false);
+        Log.d(TAG, "result: " + result);
         String myTeam = p.getString("my_team", "");
 
         victory = MediaPlayer.create(this, R.raw.final_battle);
@@ -39,7 +42,7 @@ public class ResultActivity extends AppCompatActivity {
             startActivity(i);
         });
 
-        if (result.equals("eliminated")) {
+        if (result) {
             if (myTeam.equals("dragons")) {
                 image.setImageResource(R.drawable.knight);
                 text.setText(R.string.eliminated_dragon);
@@ -60,16 +63,16 @@ public class ResultActivity extends AppCompatActivity {
         }
 
         //https://stackoverflow.com/questions/16035328/how-to-close-activity-after-x-minutes
-        Handler finishTaskHandler = new Handler();
-        Runnable finishTask = new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(i);
-            }
-        };
-
-        finishTaskHandler.postDelayed(finishTask, 15000);
+//        Handler finishTaskHandler = new Handler();
+//        Runnable finishTask = new Runnable() {
+//            @Override
+//            public void run() {
+//                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+//                startActivity(i);
+//            }
+//        };
+//
+//        finishTaskHandler.postDelayed(finishTask, 15000);
     }
 
     @Override

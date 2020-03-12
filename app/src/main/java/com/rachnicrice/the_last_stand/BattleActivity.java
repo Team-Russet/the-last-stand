@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +21,7 @@ import java.util.Date;
 
 public class BattleActivity extends AppCompatActivity {
 
-    final static String TAG = "rnr.BattleActivity";
+    final static String TAG = "rnr.Battle";
     String myID = "";
     String enemyID = "";
     SharedPreferences p;
@@ -72,7 +73,22 @@ public class BattleActivity extends AppCompatActivity {
             // analyze results
             Intent intent = new Intent(getApplicationContext(), AnalyzeResultsActivity.class);
             intent.putExtra("time", date.getTime());
+            intent.putExtra("enemy_id", enemyID);
+            intent.putExtra("my_id", myID);
             startActivity(intent);
         });
+
+        //https://stackoverflow.com/questions/16035328/how-to-close-activity-after-x-minutes
+//        Handler finishTaskHandler = new Handler();
+//        Runnable finishTask = new Runnable() {
+//            @Override
+//            public void run() {
+//                Intent i = new Intent(getApplicationContext(), AnalyzeResultsActivity.class);
+//                i.putExtra("enemy_id", enemyID);
+//                i.putExtra("my_id", myID);
+//                startActivity(i);
+//            }
+//        };
+//        finishTaskHandler.postDelayed(finishTask, 60*1000);
     }
 }

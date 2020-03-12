@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,10 +29,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Date;
+
 public class TrackingService extends Service {
 
 //    Referenced from https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/
-    private static final String TAG = "rnr.TrackingService";
+    private static final String TAG = "rnr.Tracking";
     FirebaseDatabase database;
     FirebaseUser user;
     double userLatitude = 0;
@@ -48,6 +51,7 @@ public class TrackingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Toast.makeText(this, "TrackingService Created", Toast.LENGTH_SHORT).show();
 //        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) builder.setChannelId(youChannelID);
 //        buildNotification();
         database = FirebaseDatabase.getInstance();
@@ -61,13 +65,19 @@ public class TrackingService extends Service {
         compareUserLocations();
     }
 
+    @Override
+    public void onDestroy() {
+        Toast.makeText(this, "TrackingService Destroyed", Toast.LENGTH_SHORT).show();
+        super.onDestroy();
+    }
+
     //Initiate the request to track the device's location//
     private void requestLocationUpdates() {
         LocationRequest request = new LocationRequest();
 
         //Specify how often your app should request the device’s location//
 
-        request.setInterval(10000);
+        request.setInterval(1000);
 
         if (user != null) {
             String uid = user.getUid();
@@ -157,75 +167,79 @@ public class TrackingService extends Service {
         Log.d(TAG, "new location added: " + dataSnapshot.getKey());
 
         // make sure updated user location is not us
-        if(!user.getUid().equals(dataSnapshot.getKey())) {
-            Log.i(TAG, "we are not the same user");
+        if(user != null) {
+            if(!user.getUid().equals(dataSnapshot.getKey())) {
+                Log.i(TAG, "we are not the same user");
 
-            // get id of player with changed location
-            String playerID = dataSnapshot.getKey();
+                // get id of player with changed location
+                String playerID = dataSnapshot.getKey();
 
-            Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
+                Iterable<DataSnapshot> enemyLocationData = dataSnapshot.getChildren();
 
-            // make sure they are an enemy
-            DatabaseReference enemyData = database.getReference("teams/" + enemyTeam + "/" + playerID);
-            enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.getValue(Boolean.class) != null) {
-                        if (dataSnapshot.getValue(Boolean.class)) {
-                            Log.i(TAG, "we are enemies");
+                // make sure they are an enemy
+                DatabaseReference enemyData = database.getReference("teams/" + enemyTeam + "/" + playerID);
+                enemyData.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.getValue(Boolean.class) != null) {
+                            if (dataSnapshot.getValue(Boolean.class)) {
+                                Log.i(TAG, "we are enemies");
 
-                            String enemyLat = "";
-                            String enemyLong = "";
+                                String enemyLat = "";
+                                String enemyLong = "";
 
-                            for(DataSnapshot value: enemyLocationData) {
-                                if(value.getKey().equals("latitude")){
-                                    enemyLat = value.getValue().toString();
-                                    Log.i(TAG, "enemy latitude: " + enemyLat);
-                                } else {
-                                    enemyLong = value.getValue().toString();
-                                    Log.i(TAG, "enemy longitude: " + enemyLong);
+                                for(DataSnapshot value: enemyLocationData) {
+                                    if(value.getKey().equals("latitude")){
+                                        enemyLat = value.getValue().toString();
+                                        Log.i(TAG, "enemy latitude: " + enemyLat);
+                                    } else {
+                                        enemyLong = value.getValue().toString();
+                                        Log.i(TAG, "enemy longitude: " + enemyLong);
+                                    }
                                 }
-                            }
 
-                            if(!enemyLat.equals("") && !enemyLong.equals("")) {
-                                // compare user location to updated user location
-                                double distance = distanceCalc(userLatitude, userLongitutde,
-                                        Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
+                                if(!enemyLat.equals("") && !enemyLong.equals("")) {
+                                    // compare user location to updated user location
+                                    double distance = distanceCalc(userLatitude, userLongitutde,
+                                            Double.parseDouble(enemyLat), Double.parseDouble(enemyLong));
 
-                                Log.i(TAG, "distance to enemy: " + distance);
+                                    Log.i(TAG, "distance to enemy: " + distance);
 
-                                distanceHandler(distance, playerID);
-                            } else {
-                                Log.i(TAG, "enemy lat or lon was empty");
+                                    distanceHandler(distance, playerID);
+                                } else {
+                                    Log.i(TAG, "enemy lat or lon was empty");
+                                }
                             }
                         }
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.i(TAG, "databaseError");
-                }
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.i(TAG, "databaseError");
+                    }
+                });
+            }
         }
     }
 
     //reference used: https://rosettacode.org/wiki/Haversine_formula#Java
-
     public void distanceHandler (double distance, String playerID) {
-        if (distance <= 30) {
+        if (distance <= 100) {
             DatabaseReference me = database.getReference("teams/" + myTeam + "/" + user.getUid());
             DatabaseReference enemy = database.getReference("teams/" + enemyTeam + "/" + playerID);
 
-//            me.setValue(false);
             enemy.setValue(false);
+
+            SharedPreferences.Editor edit = p.edit();
+            edit.putBoolean("tracking_enabled", false);
+            edit.apply();
+            stopSelf();
 
             Intent i = new Intent(this, BattleActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.putExtra("my_id", user.getUid());
             i.putExtra("enemy_id", playerID);
             startActivity(i);
-            stopSelf();
         }
     }
 

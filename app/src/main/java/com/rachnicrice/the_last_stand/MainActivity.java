@@ -52,18 +52,21 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
+        SharedPreferences.Editor edit = p.edit();
+        edit.putBoolean("tracking_enabled", true);
+        edit.apply();
+
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.PhoneBuilder().build());
 
         //change text view to team name
-        SharedPreferences userTeam = PreferenceManager.getDefaultSharedPreferences(this);
-        String teamID = userTeam.getString("my_team", "default");
+        String teamName = p.getString("my_team", "default");
         TextView homePageTitle = findViewById(R.id.teamName);
 
-        if(!teamID.equals("default")){
-            String newText = "Team: " + teamID;
+        if(!teamName.equals("default")){
+            String newText = "Team: " + teamName;
             homePageTitle.setText(newText);
         }
 
@@ -101,12 +104,17 @@ public class MainActivity extends AppCompatActivity {
                     202);
         });
 
-//Referenced from https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/
+        //Referenced from https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/
         //Check whether GPS tracking is enabled//
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             finish();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         //Check whether this app has access to the location permission//
         int permission = ContextCompat.checkSelfPermission(this,
@@ -115,14 +123,8 @@ public class MainActivity extends AppCompatActivity {
         //If the location permission has been granted, then start the TrackerService//
         if (permission == PackageManager.PERMISSION_GRANTED) {
             startTrackerService();
-        } else {
-
-        //If the app doesn’t currently have access to the user’s location, then request access//
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST);
         }
-}
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[]
@@ -144,11 +146,22 @@ public class MainActivity extends AppCompatActivity {
     //Start the TrackerService//
     private void startTrackerService() {
 
-        if (!p.getBoolean("eliminated", false)) {
+        Log.i(TAG, "in startTrackingService, eliminated = " + p.getBoolean("eliminated", false));
+        Log.i(TAG, "in startTrackingService, tracking_enabled = " + p.getBoolean("tracking_enabled", false));
+
+        if (!p.getBoolean("eliminated", false) &&
+                p.getBoolean("tracking_enabled", false)) {
+            Log.i(TAG, "starting TrackingService");
             startService(new Intent(this, TrackingService.class));
+
+            SharedPreferences.Editor edit = p.edit();
+            edit.putBoolean("tracking_enabled", true);
+            edit.apply();
 
             //Notify the user that tracking has been enabled//
             Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.i(TAG, "not starting TrackingService");
         }
 
     }
@@ -157,8 +170,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d(TAG, "request code on auth: " + requestCode);
-
         if (requestCode == 202) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
@@ -166,6 +177,21 @@ public class MainActivity extends AppCompatActivity {
                 // Successfully signed in
                 FirebaseUser user = mAuth.getCurrentUser();
                 String uid = user.getUid();
+
+                //Check whether this app has access to the location permission//
+                int permission = ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+
+                //If the location permission has been granted, then start the TrackerService//
+                if (permission == PackageManager.PERMISSION_GRANTED) {
+                    startTrackerService();
+                } else {
+
+                    //If the app doesn’t currently have access to the user’s location, then request access//
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            PERMISSIONS_REQUEST);
+                }
 
                 // grab all teams from db
                 DatabaseReference teamRef = database.getReference("teams");
@@ -194,7 +220,13 @@ public class MainActivity extends AppCompatActivity {
                                         isOnTeam = true;
                                         edit.putString("enemy_team", "dragons");
                                         edit.putString("my_team", "knights");
+                                        edit.putBoolean("eliminated", !user.getValue(Boolean.class));
                                         edit.apply();
+
+                                        //change text view to team name
+                                        TextView homePageTitle = findViewById(R.id.teamName);
+                                        String newText = "Team: Knights";
+                                        homePageTitle.setText(newText);
 
                                         Log.d(TAG, "Logged in as " + uid +
                                                 ". My team: " + p.getString("my_team", "") +
@@ -207,7 +239,13 @@ public class MainActivity extends AppCompatActivity {
                                         isOnTeam = true;
                                         edit.putString("enemy_team", "knights");
                                         edit.putString("my_team", "dragons");
+                                        edit.putBoolean("eliminated", !user.getValue(Boolean.class));
                                         edit.apply();
+
+                                        //change text view to team name
+                                        TextView homePageTitle = findViewById(R.id.teamName);
+                                        String newText = "Team: Dragons";
+                                        homePageTitle.setText(newText);
 
                                         Log.d(TAG, "Logged in as " + uid +
                                                 ". My team: " + p.getString("my_team", "") +
@@ -229,6 +267,11 @@ public class MainActivity extends AppCompatActivity {
                                 edit.putString("my_team", "dragons");
                                 edit.apply();
 
+                                //change text view to team name
+                                TextView homePageTitle = findViewById(R.id.teamName);
+                                String newText = "Team: Dragons";
+                                homePageTitle.setText(newText);
+
                                 Log.d(TAG, "Logged in as " + uid +
                                         ". My team: " + p.getString("my_team", "") +
                                         ". Enemy team: " + p.getString("enemy_team", ""));
@@ -241,6 +284,11 @@ public class MainActivity extends AppCompatActivity {
                                 edit.putString("enemy_team", "dragons");
                                 edit.putString("my_team", "knights");
                                 edit.apply();
+
+                                //change text view to team name
+                                TextView homePageTitle = findViewById(R.id.teamName);
+                                String newText = "Team: Knights";
+                                homePageTitle.setText(newText);
 
                                 Log.d(TAG, "Logged in as " + uid +
                                         ". My team: " + p.getString("my_team", "") +

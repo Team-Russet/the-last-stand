@@ -36,7 +36,6 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
         // set intent to go to ResultActivity and default to me winning
         intent = new Intent(getApplicationContext(),
                 ResultActivity.class);
-        intent.putExtra("eliminated", false);
 
         database = FirebaseDatabase.getInstance();
 
@@ -81,7 +80,7 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
 
         Handler handler = new Handler();
         Runnable r = () -> startActivity(intent);
-        handler.postDelayed(r, 10*1000);
+        handler.postDelayed(r, 5*1000);
     }
 
     private void handleUserEvent (DataSnapshot dataSnapshot,
@@ -98,11 +97,9 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                 Log.i(TAG, "enemy time: " + enemyTime);
                 Date myDate = new Date(myTime);
                 Date enemyDate = new Date(enemyTime);
-                // Intent to trigger on result
+                SharedPreferences.Editor edit = p.edit();
                 // make sure enemy time is within the same minute
                 if(Math.abs(myTime - enemyTime) < 60*1000) {
-
-                    Log.i(TAG, "both players clicked in the last 60 seconds");
 
                     // determine who won
                     int timeDiff = myDate.compareTo(enemyDate);
@@ -111,7 +108,8 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                         Log.i(TAG, "I won!");
                         Log.i(TAG, myID + " defeats " + enemyID);
                         // move to results page with me as the winner
-                        intent.putExtra("eliminated", false);
+                        edit.putBoolean("eliminated", false);
+                        edit.apply();
                         // change my team value back to true
                         DatabaseReference myTeamRef = database.getReference("teams/" + myTeam + "/" + myID);
                         myTeamRef.setValue(true);
@@ -121,7 +119,8 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                         Log.i(TAG, "The enemy won");
                         Log.i(TAG, enemyID + " defeats " + myID);
                         // move to results page with me as the winner
-                        intent.putExtra("eliminated", true);
+                        edit.putBoolean("eliminated", true);
+                        edit.apply();
                         // change the enemy team value to true
                         DatabaseReference myTeamRef = database.getReference("teams/" + enemyTeam + "/" + enemyID);
                         myTeamRef.setValue(true);
@@ -138,7 +137,8 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                             Log.i(TAG, "I won by a coin toss");
                             Log.i(TAG, myID + " defeats " + enemyID);
                             // move to results page with me as the winner
-                            intent.putExtra("eliminated", false);
+                            edit.putBoolean("eliminated", false);
+                            edit.apply();
                             // change my team value back to true
                             DatabaseReference myTeamRef = database.getReference("teams/" + myTeam + "/" + myID);
                             myTeamRef.setValue(true);
@@ -148,7 +148,8 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                             Log.i(TAG, "The enemy won by a coin toss");
                             Log.i(TAG, enemyID + " defeats " + myID);
                             // move to results page with me as the winner
-                            intent.putExtra("eliminated", true);
+                            edit.putBoolean("eliminated", true);
+                            edit.apply();
                             // change the enemy team value to true
                             DatabaseReference myTeamRef = database.getReference("teams/" + enemyTeam + "/" + enemyID);
                             myTeamRef.setValue(true);
@@ -159,7 +160,8 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                     Log.i(TAG, "I won by default!");
                     Log.i(TAG, myID + " defeats " + enemyID);
                     // move to results page with me as the winner
-                    intent.putExtra("eliminated", false);
+                    edit.putBoolean("eliminated", false);
+                    edit.apply();
                     // update my team value to true
                     DatabaseReference myTeamRef = database.getReference("teams/" + myTeam + "/" + myID);
                     myTeamRef.setValue(true);

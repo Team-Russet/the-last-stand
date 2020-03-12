@@ -79,14 +79,16 @@ public class BattleActivity extends AppCompatActivity {
         });
 
         //https://stackoverflow.com/questions/16035328/how-to-close-activity-after-x-minutes
-        Handler finishTaskHandler = new Handler();
-        Runnable finishTask = new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(i);
-            }
-        };
-        finishTaskHandler.postDelayed(finishTask, 60*1000);
+//        Handler finishTaskHandler = new Handler();
+//        Runnable finishTask = new Runnable() {
+//            @Override
+//            public void run() {
+//                Intent i = new Intent(getApplicationContext(), AnalyzeResultsActivity.class);
+//                i.putExtra("enemy_id", enemyID);
+//                i.putExtra("my_id", myID);
+//                startActivity(i);
+//            }
+//        };
+//        finishTaskHandler.postDelayed(finishTask, 60*1000);
     }
 }

@@ -63,16 +63,16 @@ public class ResultActivity extends AppCompatActivity {
         }
 
         //https://stackoverflow.com/questions/16035328/how-to-close-activity-after-x-minutes
-        Handler finishTaskHandler = new Handler();
-        Runnable finishTask = new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(i);
-            }
-        };
-
-        finishTaskHandler.postDelayed(finishTask, 15000);
+//        Handler finishTaskHandler = new Handler();
+//        Runnable finishTask = new Runnable() {
+//            @Override
+//            public void run() {
+//                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+//                startActivity(i);
+//            }
+//        };
+//
+//        finishTaskHandler.postDelayed(finishTask, 15000);
     }
 
     @Override

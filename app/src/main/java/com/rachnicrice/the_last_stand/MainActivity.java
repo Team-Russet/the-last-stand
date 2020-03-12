@@ -144,11 +144,11 @@ public class MainActivity extends AppCompatActivity {
     //Start the TrackerService//
     private void startTrackerService() {
 
-        if (p.getString("eliminated", "").equals("")) {
-        startService(new Intent(this, TrackingService.class));
+        if (!p.getBoolean("eliminated", false)) {
+            startService(new Intent(this, TrackingService.class));
 
-        //Notify the user that tracking has been enabled//
-        Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+            //Notify the user that tracking has been enabled//
+            Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
         }
 
     }

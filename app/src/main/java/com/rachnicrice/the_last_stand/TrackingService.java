@@ -230,10 +230,10 @@ public class TrackingService extends Service {
 
             enemy.setValue(false);
 
-            SharedPreferences.Editor edit = p.edit();
-            edit.putBoolean("tracking_enabled", false);
-            edit.apply();
-            stopSelf();
+//            SharedPreferences.Editor edit = p.edit();
+//            edit.putBoolean("tracking_enabled", false);
+//            edit.apply();
+//            stopSelf();
 
             Intent i = new Intent(this, BattleActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -52,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        SharedPreferences.Editor edit = p.edit();
-        edit.putBoolean("tracking_enabled", true);
-        edit.apply();
+//        SharedPreferences.Editor edit = p.edit();
+//        edit.putBoolean("tracking_enabled", true);
+//        edit.apply();
 
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -147,16 +147,15 @@ public class MainActivity extends AppCompatActivity {
     private void startTrackerService() {
 
         Log.i(TAG, "in startTrackingService, eliminated = " + p.getBoolean("eliminated", false));
-        Log.i(TAG, "in startTrackingService, tracking_enabled = " + p.getBoolean("tracking_enabled", false));
+//        Log.i(TAG, "in startTrackingService, tracking_enabled = " + p.getBoolean("tracking_enabled", false));
 
-        if (!p.getBoolean("eliminated", false) &&
-                p.getBoolean("tracking_enabled", false)) {
+        if (!p.getBoolean("eliminated", false)) {
             Log.i(TAG, "starting TrackingService");
             startService(new Intent(this, TrackingService.class));
 
-            SharedPreferences.Editor edit = p.edit();
-            edit.putBoolean("tracking_enabled", true);
-            edit.apply();
+//            SharedPreferences.Editor edit = p.edit();
+//            edit.putBoolean("tracking_enabled", true);
+//            edit.apply();
 
             //Notify the user that tracking has been enabled//
             Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();

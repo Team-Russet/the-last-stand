@@ -33,6 +33,11 @@ Our user stories can be found [here.](https://trello.com/b/JDEHv6If/last-stand)
 
 ## Demo & Visuals
 
+View the live demo [here](https://youtu.be/7cLtrpC6jOo)
+
+![Auth](/assets/auth.png) ![How To Play](/assets/how_to.png)
+![Login](/assets/login.png) ![Main](/assets/main.png)
+
 
 ## About the Developers
 

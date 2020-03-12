@@ -225,6 +225,7 @@ public class TrackingService extends Service {
             i.putExtra("my_id", user.getUid());
             i.putExtra("enemy_id", playerID);
             startActivity(i);
+            stopSelf();
         }
     }
 

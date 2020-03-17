@@ -16,7 +16,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Date;
 import java.util.Objects;
@@ -50,16 +49,19 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
         String enemyID = i.getStringExtra("enemy_id");
 
         // get the times from bother users
+        // so this is going to run for any change? for any battles going on now?
+        // This should really listen just for users/${enemyID}, to make sure you're only getting the
+        // relevant information about this battle.
         DatabaseReference users = database.getReference("users");
         users.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                handleUserEvent(dataSnapshot, TAG, myTeam, enemyTeam, myTime, myID, enemyID);
+                handleUserEvent(dataSnapshot, myTeam, enemyTeam, myTime, myID, enemyID);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                handleUserEvent(dataSnapshot, TAG, myTeam, enemyTeam, myTime, myID, enemyID);
+                handleUserEvent(dataSnapshot, myTeam, enemyTeam, myTime, myID, enemyID);
             }
 
             @Override
@@ -83,14 +85,15 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
         handler.postDelayed(r, 5*1000);
     }
 
-    private void handleUserEvent (DataSnapshot dataSnapshot,
-                                  String TAG,
-                                  String myTeam,
-                                  String enemyTeam,
-                                  long myTime,
-                                  String myID,
-                                  String enemyID) {
+    private void handleUserEvent(DataSnapshot dataSnapshot,
+                                 String myTeam,
+                                 String enemyTeam,
+                                 long myTime,
+                                 String myID,
+                                 String enemyID) {
 
+        // ah, so this makes sure that we actually only get for the specific enemy.
+        // Would still be more efficient to only subscribe to that one enemy.
         if(Objects.equals(dataSnapshot.getKey(), enemyID)) {
             if(dataSnapshot.getValue(Long.class) != null) {
                 long enemyTime = dataSnapshot.getValue(Long.class);
@@ -100,6 +103,9 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                 SharedPreferences.Editor edit = p.edit();
                 // make sure enemy time is within the same minute
                 if(Math.abs(myTime - enemyTime) < 60*1000) {
+                    // Minor nitpick is that this would be better suited to a piece of code running in the cloud,
+                    // like a lambda/cloud function. You shouldn't trust the client to make calculations like
+                    // this, because then users can fake the client to claim that they always win.
 
                     // determine who won
                     int timeDiff = myDate.compareTo(enemyDate);
@@ -131,12 +137,14 @@ public class AnalyzeResultsActivity extends AppCompatActivity {
                         Log.i(TAG, "There was a tie between " + myID +
                                 " and " + enemyID);
                         // flip a coin
-                        Double result = Math.random();
+                        double result = Math.random();
                         // if result less than 0.5, I am the winner
                         if(result < 0.5) {
                             Log.i(TAG, "I won by a coin toss");
                             Log.i(TAG, myID + " defeats " + enemyID);
                             // move to results page with me as the winner
+                            // wish that these pieces weren't copy-pasted from above, but instead in methods called, say,
+                            // saveUserWin and saveEnemyWin
                             edit.putBoolean("eliminated", false);
                             edit.apply();
                             // change my team value back to true

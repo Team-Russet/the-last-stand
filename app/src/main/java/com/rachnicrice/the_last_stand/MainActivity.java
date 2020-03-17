@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
+        // zombie code 💀
 //        SharedPreferences.Editor edit = p.edit();
 //        edit.putBoolean("tracking_enabled", true);
 //        edit.apply();
@@ -170,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 202) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
@@ -198,6 +198,9 @@ public class MainActivity extends AppCompatActivity {
                 teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        // This is another piece of code that should really live in the cloud somewhere,
+                        // rather than on the user's phone.
+
                         // boolean for tracking if user on a team
                         boolean isOnTeam = false;
                         // knights team size counter
@@ -254,6 +257,8 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
 
+                        // this is another spot where you could abstract this into methods to avoid
+                        // copy-pasta
                         // if isOnTeam is false, add user to smallest team
                         if(!isOnTeam) {
                             if(knightsSize > dragonsSize) {

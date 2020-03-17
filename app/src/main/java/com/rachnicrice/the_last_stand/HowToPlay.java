@@ -16,6 +16,8 @@ public class HowToPlay extends AppCompatActivity {
         //navigate home on home button push
         View home = findViewById(R.id.home);
         home.setOnClickListener((v) -> {
+            // Rather than setting up a new intent to re-start the MainActivity, this should
+            // just call finish()
             Intent intent = new Intent(this,MainActivity.class);
             startActivity(intent);
         });

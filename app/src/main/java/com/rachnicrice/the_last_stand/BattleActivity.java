@@ -39,7 +39,9 @@ public class BattleActivity extends AppCompatActivity {
 
         //Get the user
         user = FirebaseAuth.getInstance().getCurrentUser();
-        Log.i(TAG, "user id: " + user.getUid());
+        if (user != null) {
+            Log.i(TAG, "user id: " + user.getUid());
+        }
 
         p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         myTeam = p.getString("my_team", "");
@@ -68,6 +70,7 @@ public class BattleActivity extends AppCompatActivity {
 
             Date date = new Date();
             // add timestamp to db
+            // this relies on the user's timestamp... so if I set my phone time to be 30 seconds "slow", I can always win?
             mDatabase.child("users").child(myID).setValue(date.getTime());
 
             // analyze results
